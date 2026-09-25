@@ -4,7 +4,7 @@ Custom integration for Cumulus MX via its local web tag API. Early release: test
 
 ## Installation
 
-In HACS, add `andrewt81/hacs-cumulusmx` as a custom **Integration** repository, install, restart Home Assistant, then go to **Settings → Devices & services → Add integration → Cumulus MX**. Enter an address reachable **from Home Assistant**, port (usually 8998), HTTP/HTTPS, and polling interval.
+In HACS, add `andrewt81/hacs-cumulusmx` as a custom **Integration** repository, install, restart Home Assistant, then go to **Settings → Devices & services → Add integration → Cumulus MX**. Enter an address reachable **from Home Assistant**, port (usually 8998), HTTP/HTTPS, and polling interval. Optionally enter one or more **local source IP addresses** for the outbound bind, separated by commas (e.g. `192.168.10.2, 10.0.0.2`). Each address must belong to the Home Assistant host/container network namespace. The integration tries them in order and uses the first reachable route; leave the field empty for normal OS routing. This setting does not configure which interfaces Cumulus MX listens on.
 
 Alternatively copy `custom_components/cumulusmx` into the Home Assistant config directory and restart.
 
