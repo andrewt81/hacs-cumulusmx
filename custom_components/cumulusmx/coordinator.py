@@ -23,11 +23,23 @@ async def fetch(session, data):
 
 
 class CumulusCoordinator(DataUpdateCoordinator):
-    def __init__(self, hass, entry, session):
+    def __init__(self, hass, entry, sessions, owns_sessions=False):
         super().__init__(hass, logger=__import__("logging").getLogger(__name__), name=DOMAIN,
                          update_interval=timedelta(seconds=entry.data.get("interval", DEFAULT_INTERVAL)), always_update=False)
         self.entry = entry
-        self.session = session
+        self.sessions = sessions
+        self.owns_sessions = owns_sessions
 
     async def _async_update_data(self):
-        return await fetch(self.session, self.entry.data)
+        failures = []
+        for session in self.sessions:
+            try:
+                return await fetch(session, self.entry.data)
+            except UpdateFailed as exc:
+                failures.append(str(exc))
+        raise UpdateFailed("All configured source addresses failed: " + "; ".join(failures))
+
+    async def close(self):
+        if self.owns_sessions:
+            for session in self.sessions:
+                await session.close()
