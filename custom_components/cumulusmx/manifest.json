@@ -1,0 +1,11 @@
+{
+  "domain": "cumulusmx",
+  "name": "Cumulus MX",
+  "version": "0.1.0",
+  "config_flow": true,
+  "documentation": "https://github.com/andrewt81/hacs-cumulusmx",
+  "issue_tracker": "https://github.com/andrewt81/hacs-cumulusmx/issues",
+  "dependencies": [],
+  "codeowners": [],
+  "iot_class": "local_polling"
+}
