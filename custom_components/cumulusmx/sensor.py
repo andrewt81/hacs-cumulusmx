@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from homeassistant.components.sensor import SensorDeviceClass, SensorEntity, SensorStateClass
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from .const import DOMAIN
+from .discovery import available_tags, numeric_value
 
 
 @dataclass(frozen=True)
@@ -23,12 +24,22 @@ READINGS = (
     Reading("bearing", "Wind direction"),
     Reading("rfall", "Rain today", "rainunit", SensorDeviceClass.PRECIPITATION, None),
     Reading("rrate", "Rain rate", "rainunit", SensorDeviceClass.PRECIPITATION_INTENSITY),
+    Reading("intemp", "Indoor temperature", "tempunitnodeg", SensorDeviceClass.TEMPERATURE),
+    Reading("inhum", "Indoor humidity", None, SensorDeviceClass.HUMIDITY),
+    Reading("wchill", "Wind chill", "tempunitnodeg", SensorDeviceClass.TEMPERATURE),
+    Reading("heatindex", "Heat index", "tempunitnodeg", SensorDeviceClass.TEMPERATURE),
+    Reading("UV", "UV index"),
+    Reading("SolarRad", "Solar radiation", None, SensorDeviceClass.IRRADIANCE),
 )
 
 
 def unit(reading, payload):
-    if reading.key == "hum":
+    if reading.key in ("hum", "inhum"):
         return "%"
+    if reading.key == "SolarRad":
+        return "W/m²"
+    if reading.key == "UV":
+        return None
     if reading.key == "bearing":
         return "°"
     raw = payload.get(reading.unit_tag, "") if reading.unit_tag else ""
@@ -43,7 +54,17 @@ def unit(reading, payload):
 
 async def async_setup_entry(hass, entry, async_add_entities):
     coordinator = hass.data[DOMAIN][entry.entry_id]
-    async_add_entities(CumulusSensor(coordinator, entry, item) for item in READINGS)
+    known = set()
+
+    def add_available():
+        available = available_tags(coordinator.data, (item.key for item in READINGS))
+        new = [item for item in READINGS if item.key in available and item.key not in known]
+        if new:
+            known.update(item.key for item in new)
+            async_add_entities(CumulusSensor(coordinator, entry, item) for item in new)
+
+    add_available()
+    entry.async_on_unload(coordinator.async_add_listener(add_available))
 
 
 class CumulusSensor(CoordinatorEntity, SensorEntity):
@@ -65,10 +86,4 @@ class CumulusSensor(CoordinatorEntity, SensorEntity):
 
     @property
     def native_value(self):
-        value = self.coordinator.data.get(self.reading.key)
-        if value is None or str(value).strip() in ("", "---", "-999", "-999.0") or "web tag error" in str(value).lower():
-            return None
-        try:
-            return float(str(value).replace(",", "."))
-        except ValueError:
-            return None
+        return numeric_value(self.coordinator.data, self.reading.key)
