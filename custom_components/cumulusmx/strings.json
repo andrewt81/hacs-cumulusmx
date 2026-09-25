@@ -1,1 +1,24 @@
-{"config":{"step":{"user":{"title":"Connect to Cumulus MX","data":{"host":"Host or IP address","port":"Port","scheme":"Protocol","interval":"Polling interval (seconds)"}}},"error":{"cannot_connect":"Could not read the Cumulus MX local API","invalid_host":"Enter a host name or IP address without a URL path"},"abort":{"already_configured":"This instance is already configured"}}}
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Connect to Cumulus MX",
+        "data": {
+          "host": "Host or IP address",
+          "port": "Port",
+          "scheme": "Protocol",
+          "interval": "Polling interval (seconds)",
+          "bind_addresses": "Local source IP addresses to bind (comma separated)"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Could not read the Cumulus MX local API",
+      "invalid_host": "Enter a host name or IP address without a URL path",
+      "invalid_bind_addresses": "Enter valid local source IP addresses separated by commas"
+    },
+    "abort": {
+      "already_configured": "This instance is already configured"
+    }
+  }
+}
