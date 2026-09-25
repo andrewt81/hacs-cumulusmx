@@ -1,0 +1,1 @@
+{"config":{"step":{"user":{"title":"Connect to Cumulus MX","data":{"host":"Host or IP address","port":"Port","scheme":"Protocol","interval":"Polling interval (seconds)"}}},"error":{"cannot_connect":"Could not read the Cumulus MX local API","invalid_host":"Enter a host name or IP address without a URL path"},"abort":{"already_configured":"This instance is already configured"}}}
